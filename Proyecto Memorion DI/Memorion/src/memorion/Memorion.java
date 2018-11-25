@@ -22,7 +22,7 @@ public class Memorion {
         SplashScreen s=new SplashScreen();
         s.setVisible(true);
         try {
-            Thread.sleep(10000);
+            Thread.sleep(1000);
         } catch (InterruptedException ex) {
             Logger.getLogger(Memorion.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -30,13 +30,15 @@ public class Memorion {
         SwingUtilities.invokeLater(new Runnable(){
             @Override
             public void run(){
-                /*Aquí crean el objeto hacía su aplicación, para hacer visible*/
+                //Aquí crean el objeto hacía su aplicación, para hacer visible
                 System.out.println("Hola: Bienvenido a la aplicación...");
             }
         });
         Vista v = new Vista();
-        Thread t=new Thread(new Contador());
-        t.start();
+        //Thread t=new Thread(new Contador());
+        //t.start();
+
     }
+    
     
 }

@@ -7,6 +7,8 @@ package memorion;
 
 import java.awt.Label;
 import java.awt.Panel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -15,10 +17,10 @@ import java.awt.Panel;
 public class Contador extends Thread {
 
     private Vista v;
-    private int minutos = 0, segundos = 0, contadorCartas = 0;
+    private int minutos = 0, segundos = 0;
     private String min, seg;
     private String contador;
-    private boolean contar=true;
+    private boolean contar = true;
 
     Contador(Vista v) {
         this.v = v;
@@ -28,8 +30,18 @@ public class Contador extends Thread {
     @Override
     public void run() {
         while (true) {
-
-            if(contar){
+            
+            synchronized(this){
+                while (!contar) {
+                    try {
+                        wait();
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Contador.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+            }
+            }
+            
+            //reanudarContador();
             System.out.println(minutos + ":" + segundos);
             min = Integer.toString(minutos);
             seg = Integer.toString(segundos);
@@ -37,22 +49,37 @@ public class Contador extends Thread {
                 minutos = minutos + 1;
                 segundos = -1;
             }
-            if (minutos < 10 && (segundos == 0 || segundos < 10)) {
+            if (minutos < 10 && segundos >= 0 && segundos < 10) {
                 contador = "0" + min + ":0" + seg;
-            } else if (minutos < 10) {
+            } else if (minutos < 10 ) {
                 contador = "0" + min + ":" + seg;
             } else {
                 contador = min + ":" + seg;
             }
-            v.actualizarMarcador(contador);          
+            v.actualizarMarcador(contador);
+            System.out.println(contador);
             segundos++;
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
                 System.out.println("Error");
             }
-            }
-        }       
+
+        }
+
+    }
+
+    public int getMinutos() {
+        return minutos;
+    }
+
+    public int getSegundos() {
+        return segundos;
+    }
+    
+
+    public String getContador() {
+        return contador;
     }
 
     public void restablecerContador() {
@@ -60,8 +87,20 @@ public class Contador extends Thread {
         segundos = 0;
     }
 
-    public void setContar(boolean contar) {
+    public synchronized void controlarContador(boolean contar) {
         this.contar = contar;
+        notify();
     }
+/*
+    public synchronized void paraContador() {
+        contar=false;
+        notify();
+    }
+
+    public synchronized void reanudarContador() {
+        contar=true;
+        notify();
+        
+    }*/
 
 }
